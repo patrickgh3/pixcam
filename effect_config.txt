@@ -1,7 +1,10 @@
 ---global---
-spacing:2-2.1
+spacing:1-1.1
 order:random
 ---effect durations---
-snow:4
-rainbow:4
+snow:2
+rainbow:2
+shift:2
+static:2
+static2:2
 ---end---

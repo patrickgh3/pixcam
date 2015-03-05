@@ -47,7 +47,14 @@ load_config()
 
 def animate():
     global effect, effects, effectorder, effectspacing, pixelsize, starttime
-    if effect and time.time() > starttime + effect.duration:
+    elapsedtime = time.time() - starttime
+    
+    image = cam.get_image()
+    pixels = lambda dir, dim: int(crop[dir] * dim)
+    image = image.crop((pixels('left', camwidth), pixels('top', camheight), camwidth - pixels('right', camwidth), camheight - pixels('bottom', camheight)))
+    image = image.resize((int(image.size[0] * width / camwidth), int(image.size[1] * height / camheight)), Image.NEAREST)
+    
+    if effect and elapsedtime > effect.duration:
         stop_effect()
     elif not effect and time.time() > starttime:
         starttime = time.time()
@@ -55,14 +62,9 @@ def animate():
             effect = random.choice(effects)
         else:
             exit('not supported!')
-        effect.module.start(None, None, effect.duration)
-            
-    image = cam.get_image()
-    pixels = lambda dir, dim: int(crop[dir] * dim)
-    image = image.crop((pixels('left', camwidth), pixels('top', camheight), camwidth - pixels('right', camwidth), camheight - pixels('bottom', camheight)))
-    image = image.resize((int(image.size[0] * width / camwidth), int(image.size[1] * height / camheight)), Image.NEAREST)
+        effect.module.start(image, pixelsize, effect.duration)
     if effect:
-        image = effect.module.update(image, pixelsize, (time.time() - starttime) / effect.duration)
+        image = effect.module.update(image, pixelsize, elapsedtime / effect.duration)
     else:
         image = pixel_util.pixelize(image, pixelsize)
     

@@ -20,5 +20,11 @@ def shrink(image, pixelsize):
 def expand(image, pixelsize):
     return image.resize((int(image.size[0] * pixelsize), int(image.size[1] * pixelsize)), Image.NEAREST)
     
-def fade_transition(image, original, time):
-    return Image.blend(image, original, abs(time - 0.5) * 8 - 3)
+def fade_transition(image, original, time, transtime=.2):
+    if time < transtime:
+        alpha = time / transtime
+    elif time > 1 - transtime:
+        alpha = 1 - (time - (1 - transtime)) / transtime
+    else:
+        return image
+    return Image.blend(original, image, alpha)
